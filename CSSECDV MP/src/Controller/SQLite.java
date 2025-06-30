@@ -180,7 +180,7 @@ public class SQLite {
         }
     }
     
-    public void addUser(String username, String password) 
+    public void addUser(String username, String password) {
         // Used PreparedStatement to prevent SQL injection
         String sql = "INSERT INTO users(username,password) VALUES(?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
