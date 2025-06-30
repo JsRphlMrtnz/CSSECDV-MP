@@ -90,7 +90,9 @@ public class Login extends javax.swing.JPanel {
         String username = usernameFld.getText();
         String password = passwordFld.getText();
         boolean status = main.loginUser(username, password);
-        if (status) {
+        if (status) { // Successful login
+            usernameFld.setText("");
+            passwordFld.setText("");
             frame.mainNav();   
         }
         else

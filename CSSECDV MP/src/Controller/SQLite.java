@@ -193,6 +193,20 @@ public class SQLite {
         }
     }
     
+    public boolean hasUser(String username) {
+        String sql = "SELECT username FROM users WHERE username = ?";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) // Existing User
+                return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
     
     public ArrayList<History> getHistory(){
         String sql = "SELECT id, username, name, stock, timestamp FROM history";
@@ -292,12 +306,14 @@ public class SQLite {
     }
     
     public void addUser(String username, String password, int role) {
-        String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + password + "','" + role + "')";
-        
+        // Used PreparedStatement to prevent SQL injection
+        String sql = "INSERT INTO users(username,password,role) VALUES(?,?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
-            
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setInt(3, role);
+            pstmt.executeUpdate();
         } catch (Exception ex) {
             System.out.print(ex);
         }

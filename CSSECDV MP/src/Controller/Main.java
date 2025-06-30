@@ -114,4 +114,12 @@ public class Main {
         return sqlite.login(username, password);
     }
     
+    public boolean registerUser(String username, String password, String confirm) {
+        if (sqlite.hasUser(username))
+            return false;
+        if (!password.equals(confirm))
+            return false;
+        sqlite.addUser(username, password);
+        return true;
+    }
 }
