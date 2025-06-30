@@ -1,12 +1,16 @@
 
 package View;
 
+import Controller.Main;
+import javax.swing.JOptionPane;
+
 public class Login extends javax.swing.JPanel {
 
     public Frame frame;
-    
+    public Main main;
     public Login() {
         initComponents();
+        main = new Main();
     }
 
     @SuppressWarnings("unchecked")
@@ -15,7 +19,7 @@ public class Login extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         usernameFld = new javax.swing.JTextField();
-        passwordFld = new javax.swing.JTextField();
+        passwordFld = new javax.swing.JPasswordField();
         registerBtn = new javax.swing.JButton();
         loginBtn = new javax.swing.JButton();
 
@@ -83,7 +87,14 @@ public class Login extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
-        frame.mainNav();
+        String username = usernameFld.getText();
+        String password = passwordFld.getText();
+        boolean status = main.loginUser(username, password);
+        if (status) {
+            frame.mainNav();   
+        }
+        else
+            JOptionPane.showMessageDialog(null, "Incorrect username/password", "Login Failed", JOptionPane.ERROR_MESSAGE);
     }//GEN-LAST:event_loginBtnActionPerformed
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed

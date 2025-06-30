@@ -275,6 +275,22 @@ public class SQLite {
         return users;
     }
     
+    public boolean login(String username, String password) {
+        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) // Valid login
+                return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
     public void addUser(String username, String password, int role) {
         String sql = "INSERT INTO users(username,password,role) VALUES('" + username + "','" + password + "','" + role + "')";
         

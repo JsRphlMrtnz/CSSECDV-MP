@@ -20,9 +20,13 @@ public class Main {
         new Main().init();
     }
     
+    public Main() {
+        sqlite = new SQLite();
+    }
+    
     public void init(){
         // Initialize a driver object
-        sqlite = new SQLite();
+//        sqlite = new SQLite();
 
 //        // Create a database
 //        sqlite.createNewDatabase();
@@ -103,6 +107,11 @@ public class Main {
         // Initialize User Interface
         Frame frame = new Frame();
         frame.init(this);
+    }
+    
+    
+    public boolean loginUser(String username, String password) {
+        return sqlite.login(username, password);
     }
     
 }
