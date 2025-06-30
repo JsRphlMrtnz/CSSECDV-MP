@@ -1,12 +1,18 @@
 
 package View;
 
+import Controller.*;
+import static Controller.Main.main;
+import javax.swing.JOptionPane;
+
 public class Register extends javax.swing.JPanel {
 
     public Frame frame;
+    public Main main;
     
     public Register() {
         initComponents();
+        main = new Main();
     }
 
     @SuppressWarnings("unchecked")
@@ -97,8 +103,17 @@ public class Register extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerBtnActionPerformed
-        frame.registerAction(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
-        frame.loginNav();
+        boolean status = main.registerUser(usernameFld.getText(), passwordFld.getText(), confpassFld.getText());
+        if (status) {
+            JOptionPane.showMessageDialog(null, "Registered successfully!", "Registered", JOptionPane.INFORMATION_MESSAGE);
+            usernameFld.setText("");
+            passwordFld.setText("");
+            confpassFld.setText("");
+            frame.loginNav();
+        }
+        else
+            JOptionPane.showMessageDialog(null, "We're unable to complete your registration at this time.\nIf you already have an account, try logging in or resetting your password.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
+            
     }//GEN-LAST:event_registerBtnActionPerformed
 
     private void backBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backBtnActionPerformed
