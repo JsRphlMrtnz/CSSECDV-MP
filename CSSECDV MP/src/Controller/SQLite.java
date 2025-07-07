@@ -18,6 +18,11 @@ public class SQLite {
     public int DEBUG_MODE = 0;
     String driverURL = "jdbc:sqlite:" + "database.db";
     
+    
+    // Password Control Constants 
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_LENGTH = 64;
+    
     public void createNewDatabase() {
         try (Connection conn = DriverManager.getConnection(driverURL)) {
             if (conn != null) {
@@ -181,7 +186,12 @@ public class SQLite {
         }
     }
     
-    public void addUser(String username, String password) {
+    public boolean addUser(String username, String password) {
+        // Proper Password Strength Controls
+        if(password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH){
+            return false;
+        }
+        
         // Hash the password using a generated salt to create a unique hash.
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         
@@ -193,8 +203,10 @@ public class SQLite {
             pstmt.setString(1, username);
             pstmt.setString(2, hashedPassword);
             pstmt.executeUpdate();
+            return true;
         } catch (Exception ex) {
             System.out.print(ex);
+            return false;
         }
     }
     
@@ -324,7 +336,12 @@ public class SQLite {
         return null;
     }
     
-    public void addUser(String username, String password, int role) {
+    public boolean addUser(String username, String password, int role) {
+        
+        // Proper Password Strength Controls
+        if(password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH){
+            return false;
+        }
         
         // Hash the password using a generated salt to create a unique hash.
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -337,8 +354,10 @@ public class SQLite {
             pstmt.setString(2, hashedPassword);
             pstmt.setInt(3, role);
             pstmt.executeUpdate();
+            return true;
         } catch (Exception ex) {
             System.out.print(ex);
+            return false;
         }
     }
     
