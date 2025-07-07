@@ -2,6 +2,7 @@
 package View;
 
 import Controller.Main;
+import Model.User;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JPanel {
@@ -89,11 +90,11 @@ public class Login extends javax.swing.JPanel {
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         String username = usernameFld.getText();
         String password = passwordFld.getText();
-        boolean status = main.loginUser(username, password);
-        if (status) { // Successful login
+        User user = main.loginUser(username, password);
+        if (user != null) { // Successful login
             usernameFld.setText("");
             passwordFld.setText("");
-            frame.mainNav();   
+            frame.mainNav(user.getRole());   
         }
         else
             JOptionPane.showMessageDialog(null, "Incorrect username/password", "Login Failed", JOptionPane.ERROR_MESSAGE);

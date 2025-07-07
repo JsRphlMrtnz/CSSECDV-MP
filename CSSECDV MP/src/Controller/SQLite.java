@@ -289,7 +289,7 @@ public class SQLite {
         return users;
     }
     
-    public boolean login(String username, String password) {
+    public User login(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -298,11 +298,15 @@ public class SQLite {
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) // Valid login
-                return true;
+                return new User(rs.getInt("id"),
+                                   rs.getString("username"),
+                                   rs.getString("password"),
+                                   rs.getInt("role"),
+                                   rs.getInt("locked"));
         } catch (Exception ex) {
             System.out.print(ex);
         }
-        return false;
+        return null;
     }
     
     public void addUser(String username, String password, int role) {

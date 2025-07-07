@@ -110,7 +110,7 @@ public class Main {
     }
     
     
-    public boolean loginUser(String username, String password) {
+    public User loginUser(String username, String password) {
         return sqlite.login(username, password);
     }
     
