@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class SQLite {
     
@@ -181,12 +182,16 @@ public class SQLite {
     }
     
     public void addUser(String username, String password) {
+        // Hash the password using a generated salt to create a unique hash.
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        
         // Used PreparedStatement to prevent SQL injection
         String sql = "INSERT INTO users(username,password) VALUES(?,?)";
+        
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            pstmt.setString(2, hashedPassword);
             pstmt.executeUpdate();
         } catch (Exception ex) {
             System.out.print(ex);
@@ -290,32 +295,46 @@ public class SQLite {
     }
     
     public User login(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        // Select username only
+        String sql = "SELECT * FROM users WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
             ResultSet rs = pstmt.executeQuery();
             
-            if (rs.next()) // Valid login
-                return new User(rs.getInt("id"),
+            // If user is found
+            if (rs.next()){
+                
+                String storedHash = rs.getString("password");
+            
+                // Compare the provided password against the storedHash password from the database
+                if(BCrypt.checkpw(password, storedHash)){
+                    return new User(rs.getInt("id"),
                                    rs.getString("username"),
-                                   rs.getString("password"),
+                                   storedHash,  // Return the hashed password instead of the plain password
                                    rs.getInt("role"),
                                    rs.getInt("locked"));
+                }
+            } 
+                
         } catch (Exception ex) {
+            System.out.println("ERROR HERE");
             System.out.print(ex);
         }
         return null;
     }
     
     public void addUser(String username, String password, int role) {
+        
+        // Hash the password using a generated salt to create a unique hash.
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        
         // Used PreparedStatement to prevent SQL injection
         String sql = "INSERT INTO users(username,password,role) VALUES(?,?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            pstmt.setString(2, hashedPassword);
             pstmt.setInt(3, role);
             pstmt.executeUpdate();
         } catch (Exception ex) {
