@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class SQLite {
@@ -89,7 +90,7 @@ public class SQLite {
      
     public void createUserTable() {
         String sql = "CREATE TABLE IF NOT EXISTS users (\n"
-            + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+            + " id TEXT PRIMARY KEY,\n"
             + " username TEXT NOT NULL UNIQUE,\n"
             + " password TEXT NOT NULL,\n"
             + " role INTEGER DEFAULT 2,\n"
@@ -192,16 +193,20 @@ public class SQLite {
             return false;
         }
         
+        // userID UUID Generation
+        String userId = UUID.randomUUID().toString();
+        
         // Hash the password using a generated salt to create a unique hash.
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         
         // Used PreparedStatement to prevent SQL injection
-        String sql = "INSERT INTO users(username,password) VALUES(?,?)";
+        String sql = "INSERT INTO users(id,username,password) VALUES(?,?,?)";
         
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, username);
-            pstmt.setString(2, hashedPassword);
+            pstmt.setString(1, userId);
+            pstmt.setString(2, username);
+            pstmt.setString(3, hashedPassword);
             pstmt.executeUpdate();
             return true;
         } catch (Exception ex) {
@@ -296,7 +301,7 @@ public class SQLite {
             ResultSet rs = stmt.executeQuery(sql)){
             
             while (rs.next()) {
-                users.add(new User(rs.getInt("id"),
+                users.add(new User(rs.getString("id"),
                                    rs.getString("username"),
                                    rs.getString("password"),
                                    rs.getInt("role"),
@@ -321,7 +326,7 @@ public class SQLite {
             
                 // Compare the provided password against the storedHash password from the database
                 if(BCrypt.checkpw(password, storedHash)){
-                    return new User(rs.getInt("id"),
+                    return new User(rs.getString("id"),
                                    rs.getString("username"),
                                    storedHash,  // Return the hashed password instead of the plain password
                                    rs.getInt("role"),
@@ -343,16 +348,22 @@ public class SQLite {
             return false;
         }
         
+        // userID UUID Generation
+        String userId = UUID.randomUUID().toString();
+        
+        System.out.println("CHECK HERE: " + userId);
+        
         // Hash the password using a generated salt to create a unique hash.
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         
         // Used PreparedStatement to prevent SQL injection
-        String sql = "INSERT INTO users(username,password,role) VALUES(?,?,?)";
+        String sql = "INSERT INTO users(id,username,password,role) VALUES(?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, username);
-            pstmt.setString(2, hashedPassword);
-            pstmt.setInt(3, role);
+            pstmt.setString(1, userId);
+            pstmt.setString(2, username);
+            pstmt.setString(3, hashedPassword);
+            pstmt.setInt(4, role);
             pstmt.executeUpdate();
             return true;
         } catch (Exception ex) {

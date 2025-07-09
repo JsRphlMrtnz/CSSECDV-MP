@@ -1,7 +1,7 @@
 package Model;
 
 public class User {
-    private int id;
+    private String id;
     private String username;
     private String password;
     private int role = 2;
@@ -12,7 +12,7 @@ public class User {
         this.password = password;
     }
     
-    public User(int id, String username, String password, int role, int locked){
+    public User(String id, String username, String password, int role, int locked){
         this.id = id;
         this.username = username;
         this.password = password;
@@ -20,11 +20,11 @@ public class User {
         this.locked = locked;
     }
     
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
