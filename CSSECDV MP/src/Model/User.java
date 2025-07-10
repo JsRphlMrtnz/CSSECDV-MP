@@ -6,18 +6,20 @@ public class User {
     private String password;
     private int role = 2;
     private int locked = 0;
+    private int numLoginAttempts = 0;
 
     public User(String username, String password){
         this.username = username;
         this.password = password;
     }
     
-    public User(String id, String username, String password, int role, int locked){
+    public User(String id, String username, String password, int role, int locked, int numLoginAttempts){
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
         this.locked = locked;
+        this.numLoginAttempts = numLoginAttempts;
     }
     
     public String getId() {
@@ -59,4 +61,13 @@ public class User {
     public void setLocked(int locked) {
         this.locked = locked;
     }
+    
+    public int getNumLoginAttempts(){
+        return numLoginAttempts;
+    }
+    
+    public void setNumLoginAttempts(int numLoginAttempts){
+        this.numLoginAttempts = numLoginAttempts;
+    }
+    
 }

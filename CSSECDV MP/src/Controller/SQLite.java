@@ -20,9 +20,39 @@ public class SQLite {
     String driverURL = "jdbc:sqlite:" + "database.db";
     
     
+    // Login Lockout Mechanism Constants
+    private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
+    
+    
     // Password Control Constants 
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 64;
+    
+    public void trackFailedLoginAttempts(Connection conn, String username){
+        String sql = "UPDATE users SET failed_login_attempts = failed_login_attempts + 1, " +
+                     "locked = CASE WHEN failed_login_attempts + 1 >= ? THEN 1 ELSE locked END " +
+                     "WHERE username = ?";
+        
+         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, MAX_FAILED_LOGIN_ATTEMPTS);
+            pstmt.setString(2, username);
+            pstmt.executeUpdate();
+            System.out.println("TRACK FUNCTION EXECUTED");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void resetFailedLoginAttempts(Connection conn, String username) {
+        String sql = "UPDATE users SET failed_login_attempts = 0 WHERE username = ?";
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+}
     
     public void createNewDatabase() {
         try (Connection conn = DriverManager.getConnection(driverURL)) {
@@ -94,7 +124,8 @@ public class SQLite {
             + " username TEXT NOT NULL UNIQUE,\n"
             + " password TEXT NOT NULL,\n"
             + " role INTEGER DEFAULT 2,\n"
-            + " locked INTEGER DEFAULT 0\n"
+            + " locked INTEGER DEFAULT 0,\n"
+            + " failed_login_attempts INTEGER DEFAULT 0\n" 
             + ");";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
@@ -293,7 +324,7 @@ public class SQLite {
     }
     
     public ArrayList<User> getUsers(){
-        String sql = "SELECT id, username, password, role, locked FROM users";
+        String sql = "SELECT id, username, password, role, locked, failed_login_attempts FROM users";
         ArrayList<User> users = new ArrayList<User>();
         
         try (Connection conn = DriverManager.getConnection(driverURL);
@@ -305,7 +336,8 @@ public class SQLite {
                                    rs.getString("username"),
                                    rs.getString("password"),
                                    rs.getInt("role"),
-                                   rs.getInt("locked")));
+                                   rs.getInt("locked"),
+                                   rs.getInt("failed_login_attempts")));
             }
         } catch (Exception ex) {}
         return users;
@@ -321,21 +353,37 @@ public class SQLite {
             
             // If user is found
             if (rs.next()){
-                
+                int locked = rs.getInt("locked");
                 String storedHash = rs.getString("password");
+                
+                if(locked == 1){
+                    System.err.println("Login failed: Account for " + username + " is locked.");
+                    return null;
+                }
             
                 // Compare the provided password against the storedHash password from the database
                 if(BCrypt.checkpw(password, storedHash)){
+                    resetFailedLoginAttempts(conn, username);
                     return new User(rs.getString("id"),
                                    rs.getString("username"),
                                    storedHash,  // Return the hashed password instead of the plain password
                                    rs.getInt("role"),
-                                   rs.getInt("locked"));
+                                   rs.getInt("locked"),
+                                   rs.getInt("failed_login_attempts"));
+                }else{
+                    // Password Mismatch
+                    trackFailedLoginAttempts(conn, username);
+                    System.err.println("Login failed. AAAIncorrect Username/Password");
+                    return null;
                 }
-            } 
+            }else{
+                // User not found
+                System.err.println("Login failed. Incorrect Username/Password");
+                return null;
+            }
                 
         } catch (Exception ex) {
-            System.out.println("ERROR HERE");
+            System.out.println("Login Error");
             System.out.print(ex);
         }
         return null;
@@ -351,20 +399,22 @@ public class SQLite {
         // userID UUID Generation
         String userId = UUID.randomUUID().toString();
         
-        System.out.println("CHECK HERE: " + userId);
+        
         
         // Hash the password using a generated salt to create a unique hash.
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         
         // Used PreparedStatement to prevent SQL injection
-        String sql = "INSERT INTO users(id,username,password,role) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO users(id,username,password,role,failed_login_attempts) VALUES(?,?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
             pstmt.setString(2, username);
             pstmt.setString(3, hashedPassword);
             pstmt.setInt(4, role);
+            pstmt.setInt(5, 0);
             pstmt.executeUpdate();
+            System.out.println("CHECK CHECKCGHECK: " + userId);
             return true;
         } catch (Exception ex) {
             System.out.print(ex);
