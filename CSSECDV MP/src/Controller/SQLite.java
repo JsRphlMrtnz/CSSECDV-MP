@@ -37,7 +37,6 @@ public class SQLite {
             pstmt.setInt(1, MAX_FAILED_LOGIN_ATTEMPTS);
             pstmt.setString(2, username);
             pstmt.executeUpdate();
-            System.out.println("TRACK FUNCTION EXECUTED");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -414,7 +413,6 @@ public class SQLite {
             pstmt.setInt(4, role);
             pstmt.setInt(5, 0);
             pstmt.executeUpdate();
-            System.out.println("CHECK CHECKCGHECK: " + userId);
             return true;
         } catch (Exception ex) {
             System.out.print(ex);
@@ -428,7 +426,6 @@ public class SQLite {
         try (Connection conn = DriverManager.getConnection(driverURL);
             Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("User " + username + " has been deleted.");
         } catch (Exception ex) {
             System.out.print(ex);
         }
