@@ -358,7 +358,7 @@ public class SQLite {
                 
                 if(locked == 1){
                     System.err.println("Login failed: Account for " + username + " is locked.");
-                    return null;
+                    return new User("", "", "", 0, 0, -1);
                 }
             
                 // Compare the provided password against the storedHash password from the database

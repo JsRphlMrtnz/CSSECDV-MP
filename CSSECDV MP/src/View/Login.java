@@ -91,10 +91,14 @@ public class Login extends javax.swing.JPanel {
         String username = usernameFld.getText();
         String password = passwordFld.getText();
         User user = main.loginUser(username, password);
-        if (user != null) { // Successful login
+        if (user != null) { 
+            if (user.getNumLoginAttempts() == -1)
+                JOptionPane.showMessageDialog(null, "You have reached the maximum number of attempts to login.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            else {
             usernameFld.setText("");
             passwordFld.setText("");
             frame.mainNav(user.getRole());   
+            }
         }
         else
             JOptionPane.showMessageDialog(null, "Incorrect username/password", "Login Failed", JOptionPane.ERROR_MESSAGE);
