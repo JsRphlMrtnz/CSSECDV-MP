@@ -136,6 +136,24 @@ public class SQLite {
         }
     }
     
+    public void createSessionsTable(){
+        String sql = "CREATE TABLE IF NOT EXISTS sessions (\n"
+            + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+            + " user_id TEXT NOT NULL,\n"        
+            + " token TEXT NOT NULL UNIQUE,\n"   
+            + " timestamp INTEGER NOT NULL,\n"   
+            + " FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE\n"
+            + ");";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table sessions in database.db created.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
     public void dropHistoryTable() {
         String sql = "DROP TABLE IF EXISTS history;";
 
