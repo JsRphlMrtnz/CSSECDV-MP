@@ -184,11 +184,12 @@ public class MgmtUser extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void editRoleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRoleBtnActionPerformed
-        User selectedUser = this.usersList.get(table.getSelectedRow());
-        User currentUser = main.getCurrentUser();
 
-        if (currentUser.getRole() == 5) {
-            if (table.getSelectedRow() >= 0) {
+        if (table.getSelectedRow() >= 0) {
+            User selectedUser = this.usersList.get(table.getSelectedRow());
+            User currentUser = main.getCurrentUser();
+            
+            if (currentUser.getRole() == 5) {
                 // Authorization Check: Prevent an admin from changing their own role
                 if (currentUser.getUsername().equals(selectedUser.getUsername())) {
                     JOptionPane.showMessageDialog(this, "You cannot edit your own role.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
@@ -217,9 +218,11 @@ public class MgmtUser extends javax.swing.JPanel {
                     sqlite.updateUserRole(selectedUser.getId(), newRole);
                     init();
                 }
+            }else{
+                JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please select a user from the table first.", "No User Selected", JOptionPane.WARNING_MESSAGE);
         }
 
     }//GEN-LAST:event_editRoleBtnActionPerformed
@@ -254,21 +257,50 @@ public class MgmtUser extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
             }
 
+        }else{
+            JOptionPane.showMessageDialog(this, "Please select a user from the table first.", "No User Selected", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void lockBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockBtnActionPerformed
+       
         if (table.getSelectedRow() >= 0) {
-            String state = "lock";
-            if ("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")) {
-                state = "unlock";
-            }
+            User selectedUser = this.usersList.get(table.getSelectedRow());
+            User currentUser = main.getCurrentUser();
 
-            int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
+            // Authorization Check: Only an admin can lock a user.
+            if (currentUser.getRole() == 5) {
+                // Authorization Check: Prevent self-lock
+                if (currentUser.getUsername().equals(selectedUser.getUsername())) {
+                    JOptionPane.showMessageDialog(this, "You cannot lock your own account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-            if (result == JOptionPane.YES_OPTION) {
-                System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                // Authorization Check: Prevent an admin from locking another admin
+                if (selectedUser.getRole() == 5) {
+                    JOptionPane.showMessageDialog(this, "You cannot lock another admin's account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                String state = "lock";
+                if(selectedUser.getLocked() == 1){
+                    state = "unlock";
+                }
+
+                int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + selectedUser.getUsername() + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
+
+               
+                int newStatus = (selectedUser.getLocked() == 0) ? 1 : 0;
+                
+                if (result == JOptionPane.YES_OPTION) {
+                    sqlite.updateUserLockStatus(selectedUser.getId(), newStatus);
+                    init();
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a user from the table first.", "No User Selected", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_lockBtnActionPerformed
 
