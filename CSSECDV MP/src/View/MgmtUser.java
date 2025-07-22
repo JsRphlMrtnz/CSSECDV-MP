@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.User;
 import java.util.ArrayList;
@@ -23,11 +24,14 @@ import javax.swing.table.DefaultTableModel;
 public class MgmtUser extends javax.swing.JPanel {
 
     public SQLite sqlite;
+    public Main main;
     public DefaultTableModel tableModel;
+    private ArrayList<User> usersList;
     
-    public MgmtUser(SQLite sqlite) {
+    public MgmtUser(Main main) {
         initComponents();
-        this.sqlite = sqlite;
+        this.main = main;
+        this.sqlite = main.sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         
@@ -45,14 +49,14 @@ public class MgmtUser extends javax.swing.JPanel {
         }
         
 //      LOAD CONTENTS
-        ArrayList<User> users = sqlite.getUsers();
-        for(int nCtr = 0; nCtr < users.size(); nCtr++){
+        this.usersList = sqlite.getUsers(); 
+        for(int nCtr = 0; nCtr < usersList.size(); nCtr++){
             tableModel.addRow(new Object[]{
-                users.get(nCtr).getUsername(), 
-                users.get(nCtr).getPassword(), 
-                users.get(nCtr).getRole(), 
-                users.get(nCtr).getLocked()});
-                users.get(nCtr).getNumLoginAttempts();
+                usersList.get(nCtr).getUsername(), 
+                usersList.get(nCtr).getPassword(), 
+                usersList.get(nCtr).getRole(), 
+                usersList.get(nCtr).getLocked()});
+                usersList.get(nCtr).getNumLoginAttempts();
         }
     }
 
@@ -181,18 +185,43 @@ public class MgmtUser extends javax.swing.JPanel {
 
     private void editRoleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRoleBtnActionPerformed
         if(table.getSelectedRow() >= 0){
+            User selectedUser = this.usersList.get(table.getSelectedRow());
+            User currentUser = main.getCurrentUser();
+            
+            // Authorization Check: Prevent an admin from changing their own role
+            if (currentUser.getUsername().equals(selectedUser.getUsername())) {
+                JOptionPane.showMessageDialog(this, "You cannot edit your own role.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                return;
+            }else if(selectedUser.getRole() == 5){ // Prevent an admin from changing another admin's role.
+                JOptionPane.showMessageDialog(this, "You cannot edit another admin's role", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+             
             String[] options = {"1-DISABLED","2-CLIENT","3-STAFF","4-MANAGER","5-ADMIN"};
             JComboBox optionList = new JComboBox(options);
             
             optionList.setSelectedIndex((int)tableModel.getValueAt(table.getSelectedRow(), 2) - 1);
             
-            String result = (String) JOptionPane.showInputDialog(null, "USER: " + tableModel.getValueAt(table.getSelectedRow(), 0), 
+            String result = (String) JOptionPane.showInputDialog(null, "USER: " + selectedUser.getUsername(), 
                 "EDIT USER ROLE", JOptionPane.QUESTION_MESSAGE, null, options, options[(int)tableModel.getValueAt(table.getSelectedRow(), 2) - 1]);
             
-            if(result != null){
-                System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
-                System.out.println(result.charAt(0));
+            
+            if(currentUser.getRole() == 5){
+                if(result != null){
+                    int newRole = Integer.parseInt(result.substring(0, 1));
+                    
+                    // Authorization Check: Prevent an admin from creating another admin or a role higher than theirs
+                    if (newRole >= currentUser.getRole()) {
+                        JOptionPane.showMessageDialog(this, "You cannot assign a role equal to or higher than your own.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    sqlite.updateUserRole(selectedUser.getId(), newRole);
+                    init();
+                }
+            }else{
+                System.out.println("PERMISSION DENIED.");
             }
+ 
         }
     }//GEN-LAST:event_editRoleBtnActionPerformed
 
