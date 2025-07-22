@@ -1,5 +1,6 @@
 package View;
 
+import Model.User;
 import Controller.Main;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -200,7 +201,13 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_clientBtnActionPerformed
 
     private void logoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutBtnActionPerformed
-        frameView.show(Container, "loginPnl");
+        boolean isUserLoggedOut = main.logoutUser();
+        
+        if(isUserLoggedOut){
+            frameView.show(Container, "loginPnl");
+        }else{
+            System.out.println("USER ALREADY LOGGED OUT");      
+        }
     }//GEN-LAST:event_logoutBtnActionPerformed
 
     public Main main;
@@ -221,8 +228,12 @@ public class Frame extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         
         this.main = controller;
+        
         loginPnl.frame = this;
+        loginPnl.main = this.main;
+        
         registerPnl.frame = this;
+        registerPnl.main = this.main; 
         
         adminHomePnl.init(main.sqlite);
         clientHomePnl.init(main.sqlite);
@@ -244,11 +255,11 @@ public class Frame extends javax.swing.JFrame {
         this.setVisible(true);
     }
     
-    public void mainNav(int role){
+    public void mainNav(User user){
         frameView.show(Container, "homePnl");
         
         hideAll();
-        switch (role) {
+        switch (user.getRole()) {
             case 1: // Disabled
                 break;   
             case 2: { // Client
