@@ -454,6 +454,31 @@ public class SQLite {
         }
     }
     
+    public boolean changePassword(String userId, String password){
+        // Proper Password Strength Controls
+        if(password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH){
+            System.err.println("Password validation failed: length out of bounds.");
+            return false;
+        }
+        
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        
+         try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+             pstmt.setString(1, hashedPassword);
+             pstmt.setString(2, userId);
+             pstmt.executeUpdate();
+             
+             return true;
+             
+         } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
     public void updateUserLockStatus(String userId, int newStatus){
         String sql = "UPDATE users SET locked = ? WHERE id = ?";
         

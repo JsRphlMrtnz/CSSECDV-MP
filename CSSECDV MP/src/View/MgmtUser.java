@@ -27,6 +27,9 @@ public class MgmtUser extends javax.swing.JPanel {
     public Main main;
     public DefaultTableModel tableModel;
     private ArrayList<User> usersList;
+    
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_LENGTH = 64;
 
     public MgmtUser(Main main) {
         initComponents();
@@ -306,21 +309,59 @@ public class MgmtUser extends javax.swing.JPanel {
 
     private void chgpassBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chgpassBtnActionPerformed
         if (table.getSelectedRow() >= 0) {
+            User selectedUser = this.usersList.get(table.getSelectedRow());
+            User currentUser = main.getCurrentUser();
+            
             JTextField password = new JPasswordField();
             JTextField confpass = new JPasswordField();
+            
             designer(password, "PASSWORD");
             designer(confpass, "CONFIRM PASSWORD");
+            
+            // Authorization Check: Only an admin can change a user's password.
+            if (currentUser.getRole() == 5) {                
+                // Authorization Check: Prevent an admin from changing another admin's password.
+                if (selectedUser.getRole() == 5 && !currentUser.getUsername().equals(selectedUser.getUsername())) {
+                    JOptionPane.showMessageDialog(this, "You cannot change another admin's password.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                Object[] message = {
+                    "Enter New Password:", password, confpass
+                };
 
-            Object[] message = {
-                "Enter New Password:", password, confpass
-            };
+                int result = JOptionPane.showConfirmDialog(null, message, "CHANGE PASSWORD", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
-            int result = JOptionPane.showConfirmDialog(null, message, "CHANGE PASSWORD", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
+                if (result == JOptionPane.OK_OPTION) {
+                    // If password and confirm password are not the same
+                    if(!password.getText().equals(confpass.getText())){
+                        JOptionPane.showMessageDialog(this, "The passwords you entered do not match. Please try again.", "Passwords Mismatch", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    
+                    if(password.getText().length() < MIN_PASSWORD_LENGTH || password.getText().length() > MAX_PASSWORD_LENGTH){
 
-            if (result == JOptionPane.OK_OPTION) {
-                System.out.println(password.getText());
-                System.out.println(confpass.getText());
-            }
+                        String errorMessage = String.format("Password must be between %d and %d characters long.",
+                                       MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH);
+
+                        JOptionPane.showMessageDialog(this, errorMessage, "Invalid Password Length",
+                                       JOptionPane.WARNING_MESSAGE);
+
+                        return;
+                    }
+                    
+                    boolean success = sqlite.changePassword(selectedUser.getId(), password.getText());
+                    if (success) {
+                        JOptionPane.showMessageDialog(this, "Password updated successfully.");
+                    } 
+
+                    init();
+                }
+            }else{
+                 JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
+            }  
+        }else{
+             JOptionPane.showMessageDialog(this, "Please select a user from the table first.", "No User Selected", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_chgpassBtnActionPerformed
 
