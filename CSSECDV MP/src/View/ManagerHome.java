@@ -5,6 +5,7 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.History;
 import Model.Logs;
@@ -26,17 +27,21 @@ public class ManagerHome extends javax.swing.JPanel {
     public MgmtProduct mgmtProduct;
     public MgmtUser mgmtUser;
     
+    public Main main;
+    
     private CardLayout contentView = new CardLayout();
     
     public ManagerHome() {
         initComponents();
     }
     
-    public void init(SQLite sqlite){
-        mgmtHistory = new MgmtHistory(sqlite);
-        mgmtLogs = new MgmtLogs(sqlite);
-        mgmtProduct = new MgmtProduct(sqlite);
-        mgmtUser = new MgmtUser(sqlite);
+    public void init(Main main){
+        this.main = main;
+        
+        mgmtHistory = new MgmtHistory(main.sqlite);
+        mgmtLogs = new MgmtLogs(main.sqlite);
+        mgmtProduct = new MgmtProduct(main.sqlite);
+        mgmtUser = new MgmtUser(main);
     
         Content.setLayout(contentView);
         Content.add(new Home("WELCOME MANAGER!", new java.awt.Color(153,102,255)), "home");

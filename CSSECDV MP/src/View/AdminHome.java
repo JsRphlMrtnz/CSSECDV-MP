@@ -5,6 +5,7 @@
  */
 package View;
 //[255,102,51]
+import Controller.Main;
 import Controller.SQLite;
 import Model.History;
 import Model.Logs;
@@ -32,11 +33,11 @@ public class AdminHome extends javax.swing.JPanel {
         initComponents();
     }
     
-    public void init(SQLite sqlite){
-        mgmtHistory = new MgmtHistory(sqlite);
-        mgmtLogs = new MgmtLogs(sqlite);
-        mgmtProduct = new MgmtProduct(sqlite);
-        mgmtUser = new MgmtUser(sqlite);
+    public void init(Main main){
+        mgmtHistory = new MgmtHistory(main.sqlite);
+        mgmtLogs = new MgmtLogs(main.sqlite);
+        mgmtProduct = new MgmtProduct(main.sqlite);
+        mgmtUser = new MgmtUser(main);
         
         Content.setLayout(contentView);
         Content.add(new Home("WELCOME ADMIN!", new java.awt.Color(51, 153, 255)), "home");

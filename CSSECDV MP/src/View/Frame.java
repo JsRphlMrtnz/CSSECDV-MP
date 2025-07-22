@@ -234,11 +234,11 @@ public class Frame extends javax.swing.JFrame {
         
         registerPnl.frame = this;
 //        registerPnl.main = this.main; 
-        
-        adminHomePnl.init(main.sqlite);
-        clientHomePnl.init(main.sqlite);
-        managerHomePnl.init(main.sqlite);
-        staffHomePnl.init(main.sqlite);
+
+        adminHomePnl.init(main);
+        clientHomePnl.init(main);
+        managerHomePnl.init(main);
+        staffHomePnl.init(main);
         
         Container.setLayout(frameView);
         Container.add(loginPnl, "loginPnl");
