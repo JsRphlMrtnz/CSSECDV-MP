@@ -27,47 +27,47 @@ public class MgmtUser extends javax.swing.JPanel {
     public Main main;
     public DefaultTableModel tableModel;
     private ArrayList<User> usersList;
-    
+
     public MgmtUser(Main main) {
         initComponents();
         this.main = main;
         this.sqlite = main.sqlite;
-        tableModel = (DefaultTableModel)table.getModel();
+        tableModel = (DefaultTableModel) table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
-        
+
 //        UNCOMMENT TO DISABLE BUTTONS
 //        editBtn.setVisible(false);
 //        deleteBtn.setVisible(false);
 //        lockBtn.setVisible(false);
 //        chgpassBtn.setVisible(false);
     }
-    
-    public void init(){
+
+    public void init() {
         //      CLEAR TABLE
-        for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
+        for (int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--) {
             tableModel.removeRow(0);
         }
-        
+
 //      LOAD CONTENTS
-        this.usersList = sqlite.getUsers(); 
-        for(int nCtr = 0; nCtr < usersList.size(); nCtr++){
+        this.usersList = sqlite.getUsers();
+        for (int nCtr = 0; nCtr < usersList.size(); nCtr++) {
             tableModel.addRow(new Object[]{
-                usersList.get(nCtr).getUsername(), 
-                usersList.get(nCtr).getPassword(), 
-                usersList.get(nCtr).getRole(), 
+                usersList.get(nCtr).getUsername(),
+                usersList.get(nCtr).getPassword(),
+                usersList.get(nCtr).getRole(),
                 usersList.get(nCtr).getLocked()});
-                usersList.get(nCtr).getNumLoginAttempts();
+            usersList.get(nCtr).getNumLoginAttempts();
         }
     }
 
-    public void designer(JTextField component, String text){
+    public void designer(JTextField component, String text) {
         component.setSize(70, 600);
         component.setFont(new java.awt.Font("Tahoma", 0, 18));
         component.setBackground(new java.awt.Color(240, 240, 240));
         component.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         component.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), text, javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 12)));
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -184,32 +184,31 @@ public class MgmtUser extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void editRoleBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRoleBtnActionPerformed
-        if(table.getSelectedRow() >= 0){
-            User selectedUser = this.usersList.get(table.getSelectedRow());
-            User currentUser = main.getCurrentUser();
-            
-            // Authorization Check: Prevent an admin from changing their own role
-            if (currentUser.getUsername().equals(selectedUser.getUsername())) {
-                JOptionPane.showMessageDialog(this, "You cannot edit your own role.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
-                return;
-            }else if(selectedUser.getRole() == 5){ // Prevent an admin from changing another admin's role.
-                JOptionPane.showMessageDialog(this, "You cannot edit another admin's role", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-             
-            String[] options = {"1-DISABLED","2-CLIENT","3-STAFF","4-MANAGER","5-ADMIN"};
-            JComboBox optionList = new JComboBox(options);
-            
-            optionList.setSelectedIndex((int)tableModel.getValueAt(table.getSelectedRow(), 2) - 1);
-            
-            String result = (String) JOptionPane.showInputDialog(null, "USER: " + selectedUser.getUsername(), 
-                "EDIT USER ROLE", JOptionPane.QUESTION_MESSAGE, null, options, options[(int)tableModel.getValueAt(table.getSelectedRow(), 2) - 1]);
-            
-            
-            if(currentUser.getRole() == 5){
-                if(result != null){
+        User selectedUser = this.usersList.get(table.getSelectedRow());
+        User currentUser = main.getCurrentUser();
+
+        if (currentUser.getRole() == 5) {
+            if (table.getSelectedRow() >= 0) {
+                // Authorization Check: Prevent an admin from changing their own role
+                if (currentUser.getUsername().equals(selectedUser.getUsername())) {
+                    JOptionPane.showMessageDialog(this, "You cannot edit your own role.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else if (selectedUser.getRole() == 5) { // Prevent an admin from changing another admin's role.
+                    JOptionPane.showMessageDialog(this, "You cannot edit another admin's role", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String[] options = {"1-DISABLED", "2-CLIENT", "3-STAFF", "4-MANAGER", "5-ADMIN"};
+                JComboBox optionList = new JComboBox(options);
+
+                optionList.setSelectedIndex((int) tableModel.getValueAt(table.getSelectedRow(), 2) - 1);
+
+                String result = (String) JOptionPane.showInputDialog(null, "USER: " + selectedUser.getUsername(),
+                        "EDIT USER ROLE", JOptionPane.QUESTION_MESSAGE, null, options, options[(int) tableModel.getValueAt(table.getSelectedRow(), 2) - 1]);
+
+                if (result != null) {
                     int newRole = Integer.parseInt(result.substring(0, 1));
-                    
+
                     // Authorization Check: Prevent an admin from creating another admin or a role higher than theirs
                     if (newRole >= currentUser.getRole()) {
                         JOptionPane.showMessageDialog(this, "You cannot assign a role equal to or higher than your own.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
@@ -218,56 +217,55 @@ public class MgmtUser extends javax.swing.JPanel {
                     sqlite.updateUserRole(selectedUser.getId(), newRole);
                     init();
                 }
-            }else{
-                System.out.println("PERMISSION DENIED.");
             }
- 
+        } else {
+            JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_editRoleBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
-        if(table.getSelectedRow() >= 0){
-            
+        if (table.getSelectedRow() >= 0) {
+
             User selectedUser = this.usersList.get(table.getSelectedRow());
             User currentUser = main.getCurrentUser();
-            
+
             // Authorization Check: Only an admin can delete a user.
-            if(currentUser.getRole() == 5){
+            if (currentUser.getRole() == 5) {
                 // Authorization Check: Prevent self-deletion
                 if (currentUser.getUsername().equals(selectedUser.getUsername())) {
                     JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                
+
                 // Authorization Check: Prevent an admin from deleting another admin
                 if (selectedUser.getRole() == 5) {
                     JOptionPane.showMessageDialog(this, "You cannot delete another admin's account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
                     return;
-                } 
-                
+                }
+
                 int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedUser.getUsername() + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
-            
+
                 if (result == JOptionPane.YES_OPTION) {
                     sqlite.removeUser(selectedUser.getUsername());
                     init();
                 }
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
             }
-            
-            
+
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
 
     private void lockBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lockBtnActionPerformed
-        if(table.getSelectedRow() >= 0){
+        if (table.getSelectedRow() >= 0) {
             String state = "lock";
-            if("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")){
+            if ("1".equals(tableModel.getValueAt(table.getSelectedRow(), 3) + "")) {
                 state = "unlock";
             }
-            
+
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
-            
+
             if (result == JOptionPane.YES_OPTION) {
                 System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
             }
@@ -275,18 +273,18 @@ public class MgmtUser extends javax.swing.JPanel {
     }//GEN-LAST:event_lockBtnActionPerformed
 
     private void chgpassBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chgpassBtnActionPerformed
-        if(table.getSelectedRow() >= 0){
+        if (table.getSelectedRow() >= 0) {
             JTextField password = new JPasswordField();
             JTextField confpass = new JPasswordField();
             designer(password, "PASSWORD");
             designer(confpass, "CONFIRM PASSWORD");
-            
+
             Object[] message = {
                 "Enter New Password:", password, confpass
             };
 
             int result = JOptionPane.showConfirmDialog(null, message, "CHANGE PASSWORD", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-            
+
             if (result == JOptionPane.OK_OPTION) {
                 System.out.println(password.getText());
                 System.out.println(confpass.getText());
