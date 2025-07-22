@@ -476,9 +476,28 @@ public class SQLite {
             pstmt.setString(2, token);
             pstmt.setLong(3, System.currentTimeMillis() / 1000);
             pstmt.executeUpdate();
+            
+            // Success
+            System.out.println("Successfully added session into database."); 
         } catch (Exception ex) {
             System.out.print(ex);
         }   
+    }
+    
+    public void deleteSession(String token){
+        String sql = "DELETE FROM sessions WHERE token = ?";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+         PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, token);
+            pstmt.executeUpdate();
+            
+            // Success
+            System.out.println("Successfully deleted session."); 
+        }catch(Exception ex){
+            System.out.println("Failed to delete session.");
+            ex.printStackTrace();
+        }
+            
     }
     
     // Helpers
@@ -487,9 +506,11 @@ public class SQLite {
         String sql = "SELECT * FROM sessions WHERE token = ?";
          try(Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)){
+             pstmt.setString(1, token);
              ResultSet rs = pstmt.executeQuery();
              
              if(rs.next()){
+                 System.out.println("Session found!");
                  return new Session(
                      rs.getInt("id"),
                      rs.getString("user_id"),
@@ -497,9 +518,8 @@ public class SQLite {
                      rs.getLong("timestamp")
                  );
              }
-             
-             
          }catch(Exception ex){
+             System.out.println("Failed to find session.");
              ex.printStackTrace();
          }
          
@@ -516,7 +536,7 @@ public class SQLite {
             
             if(rs.next()){
                 String storedHash = rs.getString("password");
-                
+                System.out.println("User found!");
                 return new User(rs.getString("id"),
                                    rs.getString("username"),
                                    storedHash,  // Return the hashed password instead of the plain password
@@ -525,6 +545,7 @@ public class SQLite {
                                    rs.getInt("failed_login_attempts"));
             }         
         }catch(Exception ex){
+            System.out.println("Failed to find user.");
             ex.printStackTrace();
         }
         
