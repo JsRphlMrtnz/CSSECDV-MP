@@ -4,6 +4,7 @@ import Model.History;
 import Model.Logs;
 import Model.Product;
 import Model.User;
+import Model.Session;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -481,6 +482,29 @@ public class SQLite {
     }
     
     // Helpers
+    
+    public Session findSessionByToken(String token){
+        String sql = "SELECT * FROM sessions WHERE token = ?";
+         try(Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+             ResultSet rs = pstmt.executeQuery();
+             
+             if(rs.next()){
+                 return new Session(
+                     rs.getInt("id"),
+                     rs.getString("user_id"),
+                     rs.getString("token"),
+                     rs.getLong("timestamp")
+                 );
+             }
+             
+             
+         }catch(Exception ex){
+             ex.printStackTrace();
+         }
+         
+         return null;    
+    }
     
     public User findUserById(String userId){
         String sql = "SELECT * FROM users WHERE id = ?";
