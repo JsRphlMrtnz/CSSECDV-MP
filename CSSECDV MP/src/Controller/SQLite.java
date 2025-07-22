@@ -480,4 +480,31 @@ public class SQLite {
         }   
     }
     
+    // Helpers
+    
+    public User findUserById(String userId){
+        String sql = "SELECT * FROM users WHERE id = ?";
+        
+        try(Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if(rs.next()){
+                String storedHash = rs.getString("password");
+                
+                return new User(rs.getString("id"),
+                                   rs.getString("username"),
+                                   storedHash,  // Return the hashed password instead of the plain password
+                                   rs.getInt("role"),
+                                   rs.getInt("locked"),
+                                   rs.getInt("failed_login_attempts"));
+            }         
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        
+        return null;
+    }
+    
 }
