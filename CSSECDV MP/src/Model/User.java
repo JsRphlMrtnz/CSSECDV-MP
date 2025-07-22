@@ -22,48 +22,52 @@ public class User {
         this.numLoginAttempts = numLoginAttempts;
     }
     
+    // Getters
+    
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
+    
     public String getUsername() {
         return username;
+    }    
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public int getRole() {
+        return role;
+    }
+    
+    public int getLocked() {
+        return locked;
+    }
+
+    public int getNumLoginAttempts(){
+        return numLoginAttempts;
+    }
+    
+    // Setters
+    
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public int getRole() {
-        return role;
     }
 
     public void setRole(int role) {
         this.role = role;
     }
 
-    public int getLocked() {
-        return locked;
-    }
-
     public void setLocked(int locked) {
         this.locked = locked;
-    }
-    
-    public int getNumLoginAttempts(){
-        return numLoginAttempts;
     }
     
     public void setNumLoginAttempts(int numLoginAttempts){
