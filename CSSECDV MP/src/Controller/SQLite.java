@@ -440,12 +440,16 @@ public class SQLite {
     }
     
     public void removeUser(String username) {
-        String sql = "DELETE FROM users WHERE username='" + username + "';";
+        String sql = "DELETE FROM users WHERE username = ?";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+            System.out.println("Successfully deleted user!");
         } catch (Exception ex) {
+            System.out.println("Error deleting user: " + username);
             System.out.print(ex);
         }
     }

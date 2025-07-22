@@ -227,11 +227,35 @@ public class MgmtUser extends javax.swing.JPanel {
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
         if(table.getSelectedRow() >= 0){
-            int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
             
-            if (result == JOptionPane.YES_OPTION) {
-                System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+            User selectedUser = this.usersList.get(table.getSelectedRow());
+            User currentUser = main.getCurrentUser();
+            
+            // Authorization Check: Only an admin can delete a user.
+            if(currentUser.getRole() == 5){
+                // Authorization Check: Prevent self-deletion
+                if (currentUser.getUsername().equals(selectedUser.getUsername())) {
+                    JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                // Authorization Check: Prevent an admin from deleting another admin
+                if (selectedUser.getRole() == 5) {
+                    JOptionPane.showMessageDialog(this, "You cannot delete another admin's account.", "Action Forbidden", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } 
+                
+                int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedUser.getUsername() + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
+            
+                if (result == JOptionPane.YES_OPTION) {
+                    sqlite.removeUser(selectedUser.getUsername());
+                    init();
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, "You do not have permission to perform this action.", "Permission Denied", JOptionPane.ERROR_MESSAGE);
             }
+            
+            
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
 
