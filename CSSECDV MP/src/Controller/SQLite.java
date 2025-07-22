@@ -500,6 +500,21 @@ public class SQLite {
             
     }
     
+    public void updateUserRole(String userId, int role){
+        String sql = "UPDATE users SET role = ? WHERE id = ?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+         PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, role);
+            pstmt.setString(2, userId);
+            pstmt.executeUpdate();
+            
+            System.out.println("[SQLITE] Successfully updated user role.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     // Helpers
     
     public Session findSessionByToken(String token){
