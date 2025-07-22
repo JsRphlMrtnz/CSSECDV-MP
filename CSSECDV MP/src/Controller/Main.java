@@ -29,7 +29,8 @@ public class Main {
    
     /*
         When starting the application for the first time, set this to true. 
-        When reopening it with the same database, STRICTLY SET THIS TO FALSE
+        When reopening the application with the same database, 
+        STRICTLY SET THIS VALUE TO false
     */
     private static final boolean initializeDatabase = true;
     
