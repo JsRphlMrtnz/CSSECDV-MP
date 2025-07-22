@@ -230,10 +230,10 @@ public class Frame extends javax.swing.JFrame {
         this.main = controller;
         
         loginPnl.frame = this;
-        loginPnl.main = this.main;
+//        loginPnl.main = this.main;
         
         registerPnl.frame = this;
-        registerPnl.main = this.main; 
+//        registerPnl.main = this.main; 
         
         adminHomePnl.init(main.sqlite);
         clientHomePnl.init(main.sqlite);

@@ -24,7 +24,7 @@ public class Main {
     
     private static final String SESSION_FILE = "session.dat";
     
-    private User currentUser = null;
+    private static User currentUser = null;
     
    
     /*
@@ -32,7 +32,7 @@ public class Main {
         When reopening the application with the same database, 
         STRICTLY SET THIS VALUE TO false
     */
-    private static final boolean initializeDatabase = true;
+    private static final boolean initializeDatabase = false;
     
     public static void main(String[] args) {
         new Main().init();

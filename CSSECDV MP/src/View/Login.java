@@ -11,7 +11,7 @@ public class Login extends javax.swing.JPanel {
     public Main main;
     public Login() {
         initComponents();
-//        main = new Main();
+        main = new Main();
     }
 
     @SuppressWarnings("unchecked")
