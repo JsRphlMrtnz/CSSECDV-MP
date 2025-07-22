@@ -32,7 +32,7 @@ public class Main {
         When reopening the application with the same database, 
         STRICTLY SET THIS VALUE TO false
     */
-    private static final boolean initializeDatabase = false;
+    private static final boolean initializeDatabase = true;
     
     public static void main(String[] args) {
         new Main().init();
