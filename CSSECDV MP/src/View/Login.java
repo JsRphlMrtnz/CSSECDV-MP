@@ -11,7 +11,7 @@ public class Login extends javax.swing.JPanel {
     public Main main;
     public Login() {
         initComponents();
-        main = new Main();
+//        main = new Main();
     }
 
     @SuppressWarnings("unchecked")
@@ -90,14 +90,15 @@ public class Login extends javax.swing.JPanel {
     private void loginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginBtnActionPerformed
         String username = usernameFld.getText();
         String password = passwordFld.getText();
-        User user = main.loginUser(username, password);
-        if (user != null) { 
+        boolean isLoggedIn = main.loginUser(username, password);
+        if (isLoggedIn) { 
+            User user = main.getCurrentUser();
             if (user.getNumLoginAttempts() == -1)
                 JOptionPane.showMessageDialog(null, "You have reached the maximum number of attempts to login.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             else {
             usernameFld.setText("");
             passwordFld.setText("");
-            frame.mainNav(user.getRole());   
+            frame.mainNav(user);   
             }
         }
         else
