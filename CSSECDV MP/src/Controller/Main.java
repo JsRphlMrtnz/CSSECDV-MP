@@ -31,7 +31,7 @@ public class Main {
         When starting the application for the first time, set this to true. 
         When reopening it with the same database, STRICTLY SET THIS TO FALSE
     */
-    private static final boolean initializeDatabase = false;
+    private static final boolean initializeDatabase = true;
     
     public static void main(String[] args) {
         new Main().init();
