@@ -19,12 +19,18 @@ public class Main {
     
     public SQLite sqlite;
     
+//    TOKEN EXPIRATION TIME (Currently set to 1 minute for testing)
     private static final long TOKEN_EXPIRATION_SECONDS = 60 * 1;
     
     private static final String SESSION_FILE = "session.dat";
     
     private User currentUser = null;
     
+   
+    /*
+        When starting the application for the first time, set this to true. 
+        When reopening it with the same database, STRICTLY SET THIS TO FALSE
+    */
     private static final boolean initializeDatabase = false;
     
     public static void main(String[] args) {
