@@ -463,4 +463,21 @@ public class SQLite {
         }
         return product;
     }
+    
+    
+    public void addSession(String userId, String token){
+        String sql = "INSERT INTO sessions(user_id, token, timestamp) VALUES(?,?,?)";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            
+            pstmt.setString(1, userId);
+            pstmt.setString(2, token);
+            pstmt.setLong(3, System.currentTimeMillis() / 1000);
+            pstmt.executeUpdate();
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }   
+    }
+    
 }
