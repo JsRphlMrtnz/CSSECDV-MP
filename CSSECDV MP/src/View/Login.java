@@ -94,7 +94,7 @@ public class Login extends javax.swing.JPanel {
         if (isLoggedIn) { 
             User user = main.getCurrentUser();
             if (user.getNumLoginAttempts() == -1)
-                JOptionPane.showMessageDialog(null, "You have reached the maximum number of attempts to login.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Your account is disabled. Please contact admin to enable your account", "Login Failed", JOptionPane.ERROR_MESSAGE);
             else {
             usernameFld.setText("");
             passwordFld.setText("");
