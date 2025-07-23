@@ -36,7 +36,7 @@ public class AdminHome extends javax.swing.JPanel {
     public void init(Main main){
         mgmtHistory = new MgmtHistory(main.sqlite);
         mgmtLogs = new MgmtLogs(main.sqlite);
-        mgmtProduct = new MgmtProduct(main.sqlite);
+        mgmtProduct = new MgmtProduct(main);
         mgmtUser = new MgmtUser(main);
         
         Content.setLayout(contentView);

@@ -12,7 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-
+import Controller.Main;
+import Model.User;
 /**
  *
  * @author beepxD
@@ -20,14 +21,16 @@ import javax.swing.table.DefaultTableModel;
 public class MgmtProduct extends javax.swing.JPanel {
 
     public SQLite sqlite;
+    public Main main;
     public DefaultTableModel tableModel;
+    public User currentUser;
     
-    public MgmtProduct(SQLite sqlite) {
+    public MgmtProduct(Main main) {
         initComponents();
-        this.sqlite = sqlite;
+        this.main = main;
+        this.sqlite = main.sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
-
 //        UNCOMMENT TO DISABLE BUTTONS
 //        purchaseBtn.setVisible(false);
 //        addBtn.setVisible(false);
@@ -36,6 +39,7 @@ public class MgmtProduct extends javax.swing.JPanel {
     }
 
     public void init(){
+        this.currentUser = main.getCurrentUser();
         //      CLEAR TABLE
         for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
             tableModel.removeRow(0);
@@ -48,6 +52,23 @@ public class MgmtProduct extends javax.swing.JPanel {
                 products.get(nCtr).getName(), 
                 products.get(nCtr).getStock(), 
                 products.get(nCtr).getPrice()});
+        }
+        switch (currentUser.getRole()) {
+            case 2: { // client
+                addBtn.setEnabled(false);
+                addBtn.setVisible(false);
+                editBtn.setEnabled(false);
+                editBtn.setVisible(false);
+                deleteBtn.setEnabled(false);
+                deleteBtn.setVisible(false);
+                break;
+            }
+            case 3: // staff
+            case 4: { // manager
+                purchaseBtn.setEnabled(false);
+                purchaseBtn.setVisible(false);
+                break;
+            }
         }
     }
     

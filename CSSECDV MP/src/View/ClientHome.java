@@ -39,7 +39,7 @@ public class ClientHome extends javax.swing.JPanel {
         
         mgmtHistory = new MgmtHistory(main.sqlite);
         mgmtLogs = new MgmtLogs(main.sqlite);
-        mgmtProduct = new MgmtProduct(main.sqlite);
+        mgmtProduct = new MgmtProduct(main);
         mgmtUser = new MgmtUser(main);
     
         Content.setLayout(contentView);
