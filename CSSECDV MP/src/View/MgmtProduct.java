@@ -198,15 +198,41 @@ public class MgmtProduct extends javax.swing.JPanel {
         if(table.getSelectedRow() >= 0){
             JTextField stockFld = new JTextField("0");
             designer(stockFld, "PRODUCT STOCK");
-
-            Object[] message = {
-                "How many " + tableModel.getValueAt(table.getSelectedRow(), 0) + " do you want to purchase?", stockFld
+            int stock = Integer.parseInt(tableModel.getValueAt(table.getSelectedRow(), 1).toString());
+            
+            stockFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                stockKeyTyped(evt);
             };
-
-            int result = JOptionPane.showConfirmDialog(null, message, "PURCHASE PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
-            if (result == JOptionPane.OK_OPTION) {
-                System.out.println(stockFld.getText());
+            });
+            
+            if (stock == 0) 
+                JOptionPane.showMessageDialog(this, "Product has 0 stock left.");
+            else {
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                Object[] message = {
+                    "How many " + name + " do you want to purchase?", stockFld
+                };
+                
+                int result = JOptionPane.showConfirmDialog(null, message, "PURCHASE PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
+                
+                if (result == JOptionPane.OK_OPTION) {
+                    int stockBuy = Integer.parseInt(stockFld.getText());
+                    if (stockBuy == 0)
+                        JOptionPane.showMessageDialog(this, "Quantity cannot be 0!");
+                    else if (stock < stockBuy)
+                        JOptionPane.showMessageDialog(this, "Quantity cannot be greater than remaining stock!");
+                    else { 
+                        boolean status = sqlite.purchaseProduct(name, stock, stockBuy);
+                        if (status) {
+                            // add history here
+                            JOptionPane.showMessageDialog(this, "Successfully purchased product.");
+                            init();
+                        }
+                        else
+                            JOptionPane.showMessageDialog(this, "There was an error with purchasing the product. Please try again.");
+                    }
+                }
             }
         }
     }//GEN-LAST:event_purchaseBtnActionPerformed

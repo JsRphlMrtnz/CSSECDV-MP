@@ -286,6 +286,21 @@ public class SQLite {
         return false;
     }
     
+    public boolean purchaseProduct(String name, int stock, int stockBuy) {
+        String sql = "UPDATE product SET stock=? WHERE name=?";
+        System.out.println(name + stock + " " + stockBuy);
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, stock - stockBuy);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
     public boolean addUser(String username, String password) {
         // Proper Password Strength Controls
         if(password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH){
