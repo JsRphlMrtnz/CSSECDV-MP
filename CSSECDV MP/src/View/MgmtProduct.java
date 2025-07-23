@@ -211,11 +211,34 @@ public class MgmtProduct extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_purchaseBtnActionPerformed
 
+    private void stockKeyTyped(java.awt.event.KeyEvent evt) {
+        char c = evt.getKeyChar();
+        
+        if (!Character.isDigit(c))
+            evt.consume();
+    }
+    
+    private void priceKeyTyped(java.awt.event.KeyEvent evt) {
+        char c = evt.getKeyChar();
+        
+        if (!Character.isDigit(c) && c != '.')
+            evt.consume();
+    }
     private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
         JTextField nameFld = new JTextField();
         JTextField stockFld = new JTextField();
         JTextField priceFld = new JTextField();
-
+        
+        stockFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                stockKeyTyped(evt);
+            };
+        });
+        priceFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                priceKeyTyped(evt);
+            };
+        });
         designer(nameFld, "PRODUCT NAME");
         designer(stockFld, "PRODUCT STOCK");
         designer(priceFld, "PRODUCT PRICE");
@@ -226,10 +249,34 @@ public class MgmtProduct extends javax.swing.JPanel {
 
         int result = JOptionPane.showConfirmDialog(null, message, "ADD PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
+        int stock = 0;
+        double price = 0;
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println(nameFld.getText());
-            System.out.println(stockFld.getText());
-            System.out.println(priceFld.getText());
+            String name = nameFld.getText().trim();
+            if (sqlite.hasProduct(name)) {
+                JOptionPane.showMessageDialog(this, "Product with name already exists!");
+                name = "";
+            }
+            else if (name.length() == 0)
+                JOptionPane.showMessageDialog(this, "Name cannot be empty!");
+            else {
+                try {
+                    stock = Integer.parseInt(stockFld.getText());
+                    price = Double.parseDouble(priceFld.getText());
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Invalid stock/price values. Please try again.");
+            }
+            }
+            
+            if (stock > 0 && price > 0) {
+                boolean status = sqlite.addProduct(name, stock, price);
+                if (status) {
+                    JOptionPane.showMessageDialog(this, "Successfully added product.");
+                    init();
+                }
+                else
+                    JOptionPane.showMessageDialog(this, "There was an error with adding the product. Please try again.");
+            }
         }
     }//GEN-LAST:event_addBtnActionPerformed
 
@@ -239,6 +286,21 @@ public class MgmtProduct extends javax.swing.JPanel {
             JTextField stockFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 1) + "");
             JTextField priceFld = new JTextField(tableModel.getValueAt(table.getSelectedRow(), 2) + "");
 
+            String oldName = nameFld.getText();
+            designer(nameFld, "PRODUCT NAME");
+            designer(stockFld, "PRODUCT STOCK");
+            designer(priceFld, "PRODUCT PRICE");
+
+            stockFld.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                stockKeyTyped(evt);
+            };
+        });
+            priceFld.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyTyped(java.awt.event.KeyEvent evt) {
+                    priceKeyTyped(evt);
+                };
+            });
             designer(nameFld, "PRODUCT NAME");
             designer(stockFld, "PRODUCT STOCK");
             designer(priceFld, "PRODUCT PRICE");
@@ -249,10 +311,30 @@ public class MgmtProduct extends javax.swing.JPanel {
 
             int result = JOptionPane.showConfirmDialog(null, message, "EDIT PRODUCT", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
+            int stock = 0;
+            double price = 0;
             if (result == JOptionPane.OK_OPTION) {
-                System.out.println(nameFld.getText());
-                System.out.println(stockFld.getText());
-                System.out.println(priceFld.getText());
+                String name = nameFld.getText().trim();
+                if (name.length() == 0)
+                    JOptionPane.showMessageDialog(this, "Name cannot be empty!");
+                else {
+                    try {
+                        stock = Integer.parseInt(stockFld.getText());
+                        price = Double.parseDouble(priceFld.getText());
+                    } catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(this, "Invalid stock/price values. Please try again.");
+                }
+                }
+
+                if (stock > 0 && price > 0) {
+                    boolean status = sqlite.editProduct(name, stock, price, oldName);
+                    if (status) {
+                        JOptionPane.showMessageDialog(this, "Successfully edited product.");
+                        init();
+                    }
+                    else
+                        JOptionPane.showMessageDialog(this, "There was an error with editing the product. Please try again.");
+                }
             }
         }
     }//GEN-LAST:event_editBtnActionPerformed
@@ -262,7 +344,15 @@ public class MgmtProduct extends javax.swing.JPanel {
             int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + tableModel.getValueAt(table.getSelectedRow(), 0) + "?", "DELETE PRODUCT", JOptionPane.YES_NO_OPTION);
             
             if (result == JOptionPane.YES_OPTION) {
-                System.out.println(tableModel.getValueAt(table.getSelectedRow(), 0));
+                String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                boolean status = sqlite.deleteProduct(name);
+                if (status) {
+                    JOptionPane.showMessageDialog(this, "Successfully deleted product.");
+                    init();
+                }
+                else
+                    JOptionPane.showMessageDialog(this, "There was an error with deleting the product. Please try again.");
+                    
             }
         }
     }//GEN-LAST:event_deleteBtnActionPerformed
