@@ -51,9 +51,11 @@ public class ClientHome extends javax.swing.JPanel {
         
 //        UNCOMMENT TO DISABLE BUTTONS
 //        historyBtn.setVisible(false);
-//        usersBtn.setVisible(false);
+        usersBtn.setEnabled(false);
+        usersBtn.setVisible(false);
 //        productsBtn.setVisible(false);
-//        logsBtn.setVisible(false);
+        logsBtn.setEnabled(false);
+        logsBtn.setVisible(false);
     }
     
     public void showPnl(String panelName){
