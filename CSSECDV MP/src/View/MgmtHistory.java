@@ -5,9 +5,11 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.History;
 import Model.Product;
+import Model.User;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -20,11 +22,13 @@ import javax.swing.table.DefaultTableModel;
 public class MgmtHistory extends javax.swing.JPanel {
 
     public SQLite sqlite;
+    public Main main;
     public DefaultTableModel tableModel;
+    public User currentUser;
     
-    public MgmtHistory(SQLite sqlite) {
+    public MgmtHistory(Main main) {
         initComponents();
-        this.sqlite = sqlite;
+        this.sqlite = main.sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         javax.swing.table.DefaultTableCellRenderer rightAlign = new javax.swing.table.DefaultTableCellRenderer();
@@ -40,6 +44,7 @@ public class MgmtHistory extends javax.swing.JPanel {
     }
 
     public void init(){
+        this.currentUser = main.getCurrentUser();
 //      CLEAR TABLE
         for(int nCtr = tableModel.getRowCount(); nCtr > 0; nCtr--){
             tableModel.removeRow(0);
