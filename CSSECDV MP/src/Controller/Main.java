@@ -20,7 +20,7 @@ public class Main {
     public SQLite sqlite;
     
 //    TOKEN EXPIRATION TIME (Currently set to 1 minute for testing)
-    private static final long TOKEN_EXPIRATION_SECONDS = 60 * 1;
+    private static final long TOKEN_EXPIRATION_SECONDS = 60 * 60;
     
     private static final String SESSION_FILE = "session.dat";
     
