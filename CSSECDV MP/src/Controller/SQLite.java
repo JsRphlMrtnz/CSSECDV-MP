@@ -203,7 +203,7 @@ public class SQLite {
         }
     }
     
-    public void addHistory(String username, String name, int stock, String timestamp) {
+    public boolean addHistory(String username, String name, int stock, String timestamp) {
         String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES(?,?,?,?)";
         
     try (Connection conn = DriverManager.getConnection(driverURL);
@@ -214,8 +214,10 @@ public class SQLite {
             pstmt.setString(4, timestamp);
             
             pstmt.executeUpdate();
+            return true;
         } catch (Exception ex) {
             System.out.print(ex);
+            return false;
         }
     }
     

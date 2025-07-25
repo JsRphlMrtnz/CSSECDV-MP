@@ -28,6 +28,7 @@ public class MgmtHistory extends javax.swing.JPanel {
     
     public MgmtHistory(Main main) {
         initComponents();
+        this.main = main;
         this.sqlite = main.sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import Controller.Main;
+import Model.History;
 import Model.User;
 /**
  *
@@ -226,7 +227,15 @@ public class MgmtProduct extends javax.swing.JPanel {
                         boolean status = sqlite.purchaseProduct(name, stock, stockBuy);
                         if (status) {
                             // add history here
-                            JOptionPane.showMessageDialog(this, "Successfully purchased product.");
+                            History history = new History(currentUser.getUsername(), name, stockBuy);
+                            boolean addHistoryStatus = sqlite.addHistory(history.getUsername(), name, stockBuy, history.getTimestamp().toString());
+                            
+                            if(addHistoryStatus){
+                                JOptionPane.showMessageDialog(this, "Successfully purchased product.");
+                            }else{
+                                JOptionPane.showMessageDialog(this, "Successfully purchased product, but there was an error saving the purchase history. Please contact the manager for further details.");
+                            }
+                            
                             init();
                         }
                         else
