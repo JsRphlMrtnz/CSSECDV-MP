@@ -163,6 +163,7 @@ public class Main {
                         User user = sqlite.findUserById(session.getUserId());
                         if(user != null && user.getLocked() == 0){
                             this.currentUser = user;
+                            sqlite.addLogs(new Logs("STATUS", user.getUsername(), "User log in successful."));
                             System.out.println("Successfully logged in user " + user.getUsername() + ". Session restored.");
                         }
                     }
@@ -213,6 +214,7 @@ public class Main {
             }catch(Exception e){
                 System.err.println("Error clearing persistent session: " + e.getMessage());
             }finally{
+                sqlite.addLogs(new Logs("STATUS", getCurrentUser().getUsername(), "User log out successful."));
                 setCurrentUser(null);
                 System.out.println("User has been logged out.");
                 return true;
@@ -227,6 +229,7 @@ public class Main {
             return false;
         if (!password.equals(confirm))
             return false;
+        sqlite.addLogs(new Logs("STATUS", username, "User registration successful."));
         return sqlite.addUser(username, password);
     }
     
