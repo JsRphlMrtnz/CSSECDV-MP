@@ -204,11 +204,16 @@ public class SQLite {
     }
     
     public void addHistory(String username, String name, int stock, String timestamp) {
-        String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + timestamp + "')";
+        String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES(?,?,?,?)";
         
-        try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
+    try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, name);
+            pstmt.setInt(3, stock);
+            pstmt.setString(4, timestamp);
+            
+            pstmt.executeUpdate();
         } catch (Exception ex) {
             System.out.print(ex);
         }
