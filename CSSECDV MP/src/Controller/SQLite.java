@@ -70,6 +70,7 @@ public class SQLite {
             + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
             + " username TEXT NOT NULL,\n"
             + " name TEXT NOT NULL,\n"
+            + " price REAL DEFAULT 0.00,\n"
             + " stock INTEGER DEFAULT 0,\n"
             + " timestamp TEXT NOT NULL\n"
             + ");";
@@ -203,15 +204,16 @@ public class SQLite {
         }
     }
     
-    public boolean addHistory(String username, String name, int stock, String timestamp) {
-        String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES(?,?,?,?)";
+    public boolean addHistory(String username, String name, double price, int stock, String timestamp) {
+        String sql = "INSERT INTO history(username,name,price,stock,timestamp) VALUES(?,?,?,?,?)";
         
     try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, name);
-            pstmt.setInt(3, stock);
-            pstmt.setString(4, timestamp);
+            pstmt.setDouble(3, price);
+            pstmt.setInt(4, stock);
+            pstmt.setString(5, timestamp);
             
             pstmt.executeUpdate();
             return true;
@@ -352,7 +354,7 @@ public class SQLite {
     }
     
     public ArrayList<History> getHistory(User currentUser, String searchQuery){
-        String sql = "SELECT id, username, name, stock, timestamp FROM history";
+        String sql = "SELECT id, username, name, price, stock, timestamp FROM history";
         ArrayList<History> histories = new ArrayList<History>();
         
         ArrayList<String> conditions = new ArrayList<>();
@@ -387,6 +389,7 @@ public class SQLite {
                 histories.add(new History(rs.getInt("id"),
                                    rs.getString("username"),
                                    rs.getString("name"),
+                                   rs.getDouble("price"),
                                    rs.getInt("stock"),
                                    rs.getString("timestamp")));
             }
