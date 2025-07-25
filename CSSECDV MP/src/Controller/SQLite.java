@@ -351,20 +351,34 @@ public class SQLite {
         return false;
     }
     
-    public ArrayList<History> getHistory(User currentUser){
+    public ArrayList<History> getHistory(User currentUser, String searchQuery){
         String sql = "SELECT id, username, name, stock, timestamp FROM history";
         ArrayList<History> histories = new ArrayList<History>();
         
+        ArrayList<String> conditions = new ArrayList<>();
+        ArrayList<Object> params = new ArrayList<>();
+        
         // If the current user's role is client, only get the client's purchase history list
         if(currentUser.getRole() == 2){
-            sql += " WHERE username = ?";
+            conditions.add("username = ?");
+            params.add(currentUser.getUsername());
+        }
+        
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            conditions.add("(username LIKE ? OR name LIKE ?)");
+            params.add("%" + searchQuery + "%");
+            params.add("%" + searchQuery + "%");
+        }
+        
+        if(!conditions.isEmpty()){
+            sql += " WHERE " + String.join("AND", conditions);
         }
         
         try (Connection conn = DriverManager.getConnection(driverURL);
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            if(currentUser.getRole() == 2){
-                pstmt.setString(1, currentUser.getUsername());
+            for(int i = 0; i < params.size(); i++){
+                pstmt.setObject(i + 1, params.get(i));
             }
             
             ResultSet rs = pstmt.executeQuery();
