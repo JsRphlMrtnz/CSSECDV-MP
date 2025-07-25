@@ -351,13 +351,23 @@ public class SQLite {
         return false;
     }
     
-    public ArrayList<History> getHistory(){
+    public ArrayList<History> getHistory(User currentUser){
         String sql = "SELECT id, username, name, stock, timestamp FROM history";
         ArrayList<History> histories = new ArrayList<History>();
         
+        // If the current user's role is client, only get the client's purchase history list
+        if(currentUser.getRole() == 2){
+            sql += " WHERE username = ?";
+        }
+        
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)){
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            if(currentUser.getRole() == 2){
+                pstmt.setString(1, currentUser.getUsername());
+            }
+            
+            ResultSet rs = pstmt.executeQuery();
             
             while (rs.next()) {
                 histories.add(new History(rs.getInt("id"),

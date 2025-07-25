@@ -226,7 +226,7 @@ public class MgmtProduct extends javax.swing.JPanel {
                     else { 
                         boolean status = sqlite.purchaseProduct(name, stock, stockBuy);
                         if (status) {
-                            // add history here
+
                             History history = new History(currentUser.getUsername(), name, stockBuy);
                             boolean addHistoryStatus = sqlite.addHistory(history.getUsername(), name, stockBuy, history.getTimestamp().toString());
                             
