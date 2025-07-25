@@ -225,15 +225,80 @@ public class SQLite {
         }
     }
     
-    public void addProduct(String name, int stock, double price) {
-        String sql = "INSERT INTO product(name,stock,price) VALUES('" + name + "','" + stock + "','" + price + "')";
-        
+    public boolean hasProduct(String name) {
+        String sql = "SELECT name FROM product WHERE name = ?";
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) // Existing Product
+                return true;
         } catch (Exception ex) {
             System.out.print(ex);
         }
+        return false;
+    }
+    
+    public boolean addProduct(String name, int stock, double price) {
+        String sql = "INSERT INTO product(name,stock,price) VALUES(?,?,?)";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, stock);
+            pstmt.setDouble(3, price);
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
+    public boolean editProduct(String name, int stock, double price, String oldName) {
+        String sql = "UPDATE product SET name=?,stock=?,price=? WHERE name=?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, stock);
+            pstmt.setDouble(3, price);
+            pstmt.setString(4, oldName);
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
+    public boolean deleteProduct(String name) {
+        String sql = "DELETE FROM product WHERE name = ?";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
+    public boolean purchaseProduct(String name, int stock, int stockBuy) {
+        String sql = "UPDATE product SET stock=? WHERE name=?";
+        System.out.println(name + stock + " " + stockBuy);
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, stock - stockBuy);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
     }
     
     public boolean addUser(String username, String password) {
