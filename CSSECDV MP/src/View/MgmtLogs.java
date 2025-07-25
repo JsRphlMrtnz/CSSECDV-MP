@@ -137,7 +137,24 @@ public class MgmtLogs extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
-        
+        if (table.getSelectedRows().length > 0) {
+            for (int row : table.getSelectedRows()) {
+                String event = tableModel.getValueAt(row, 0).toString();
+                String username = tableModel.getValueAt(row, 1).toString();
+                String desc = tableModel.getValueAt(row, 2).toString();
+                String timestamp = tableModel.getValueAt(row, 3).toString();
+                
+                boolean success = sqlite.deleteLogs(new Logs(row, event, username, desc, timestamp));
+                if (!success) {
+                    JOptionPane.showMessageDialog(null, "An error occurred. Please try again.", "Clear Failed", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }   
+            }
+            
+            init();
+        }
+        else
+            JOptionPane.showMessageDialog(this, "Please select log/s from the table first.", "No Log Selected", JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed

@@ -294,6 +294,22 @@ public class SQLite {
         }
     }
     
+    public boolean deleteLogs(Logs log) {
+        String sql = "DELETE FROM logs WHERE event = ? AND username = ? AND desc = ? AND timestamp = ?";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, log.getEvent());
+            pstmt.setString(2, log.getUsername());
+            pstmt.setString(3, log.getDesc());
+            pstmt.setString(4, log.getTimestamp().toString());
+            pstmt.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        return false;
+    }
+    
     public boolean hasProduct(String name) {
         String sql = "SELECT name FROM product WHERE name = ?";
         try (Connection conn = DriverManager.getConnection(driverURL);
