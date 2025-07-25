@@ -155,6 +155,30 @@ public class SQLite {
         }
     }
     
+    public void createLogsToggleTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS logsToggle (\n"
+            + " status INTEGER DEFAULT 0"
+            + ");";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Table logsToggle in database.db created.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+        
+        sql = "INSERT INTO logsToggle (status) VALUES(0)";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            System.out.println("Status in logsToggle inserted.");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
     public void dropHistoryTable() {
         String sql = "DROP TABLE IF EXISTS history;";
 
@@ -203,6 +227,32 @@ public class SQLite {
         }
     }
     
+    public void setLogsToggle(int status) {
+        String sql = "UPDATE logsToggle SET status=?";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, status);
+            pstmt.executeUpdate();
+            DEBUG_MODE = status;
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
+    public void setDebugMode() {
+        String sql = "SELECT status FROM logsToggle";
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) // Existing Product
+                DEBUG_MODE = rs.getInt("status");
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
     public void addHistory(String username, String name, int stock, String timestamp) {
         String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES('" + username + "','" + name + "','" + stock + "','" + timestamp + "')";
         
@@ -215,11 +265,30 @@ public class SQLite {
     }
     
     public void addLogs(String event, String username, String desc, String timestamp) {
-        String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES('" + event + "','" + username + "','" + desc + "','" + timestamp + "')";
+        String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES(?,?,?,?)";
         
         try (Connection conn = DriverManager.getConnection(driverURL);
-            Statement stmt = conn.createStatement()){
-            stmt.execute(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, event);
+            pstmt.setString(2, username);
+            pstmt.setString(3, desc);
+            pstmt.setString(4, timestamp);
+            pstmt.executeUpdate();
+        } catch (Exception ex) {
+            System.out.print(ex);
+        }
+    }
+    
+    public void addLogs(Logs log) {
+        String sql = "INSERT INTO logs(event,username,desc,timestamp) VALUES(?,?,?,?)";
+        
+        try (Connection conn = DriverManager.getConnection(driverURL);
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, log.getEvent());
+            pstmt.setString(2, log.getUsername());
+            pstmt.setString(3, log.getDesc());
+            pstmt.setString(4, log.getTimestamp().toString());
+            pstmt.executeUpdate();
         } catch (Exception ex) {
             System.out.print(ex);
         }
@@ -447,6 +516,7 @@ public class SQLite {
                 // Compare the provided password against the storedHash password from the database
                 if(BCrypt.checkpw(password, storedHash)){
                     resetFailedLoginAttempts(conn, username);
+                    setDebugMode();
                     return new User(rs.getString("id"),
                                    rs.getString("username"),
                                    storedHash,  // Return the hashed password instead of the plain password

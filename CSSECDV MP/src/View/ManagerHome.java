@@ -39,7 +39,7 @@ public class ManagerHome extends javax.swing.JPanel {
         this.main = main;
         
         mgmtHistory = new MgmtHistory(main.sqlite);
-        mgmtLogs = new MgmtLogs(main.sqlite);
+        mgmtLogs = new MgmtLogs(main);
         mgmtProduct = new MgmtProduct(main);
         mgmtUser = new MgmtUser(main);
     

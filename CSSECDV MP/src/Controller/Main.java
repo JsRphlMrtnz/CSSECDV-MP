@@ -32,7 +32,7 @@ public class Main {
         When reopening the application with the same database, 
         STRICTLY SET THIS VALUE TO false
     */
-    private static final boolean initializeDatabase = true;
+    private static final boolean initializeDatabase = false;
     
     public static void main(String[] args) {
         new Main().init();
@@ -64,6 +64,7 @@ public class Main {
             sqlite.createProductTable();
             sqlite.createUserTable();
             sqlite.createSessionsTable();
+            sqlite.createLogsToggleTable();
 
             // Add sample history
             sqlite.addHistory("admin", "Antivirus", 1, "2019-04-03 14:30:00.000");

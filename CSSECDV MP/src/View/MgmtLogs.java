@@ -5,9 +5,11 @@
  */
 package View;
 
+import Controller.Main;
 import Controller.SQLite;
 import Model.Logs;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -19,9 +21,9 @@ public class MgmtLogs extends javax.swing.JPanel {
     public SQLite sqlite;
     public DefaultTableModel tableModel;
     
-    public MgmtLogs(SQLite sqlite) {
+    public MgmtLogs(Main main) {
         initComponents();
-        this.sqlite = sqlite;
+        this.sqlite = main.sqlite;
         tableModel = (DefaultTableModel)table.getModel();
         table.getTableHeader().setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 14));
         
@@ -139,10 +141,14 @@ public class MgmtLogs extends javax.swing.JPanel {
     }//GEN-LAST:event_clearBtnActionPerformed
 
     private void debugBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugBtnActionPerformed
-        if(sqlite.DEBUG_MODE == 1)
-            sqlite.DEBUG_MODE = 0;
-        else
-            sqlite.DEBUG_MODE = 1;
+        if(sqlite.DEBUG_MODE == 1) {
+            sqlite.setLogsToggle(0);
+            JOptionPane.showMessageDialog(this, "Disabled debug mode.");
+        }
+        else {
+            sqlite.setLogsToggle(1);
+            JOptionPane.showMessageDialog(this, "Enabled debug mode.");
+        }
     }//GEN-LAST:event_debugBtnActionPerformed
 
 

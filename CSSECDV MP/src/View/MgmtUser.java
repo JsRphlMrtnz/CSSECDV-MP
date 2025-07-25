@@ -7,6 +7,7 @@ package View;
 
 import Controller.Main;
 import Controller.SQLite;
+import Model.Logs;
 import Model.User;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
@@ -219,6 +220,8 @@ public class MgmtUser extends javax.swing.JPanel {
                         return;
                     }
                     sqlite.updateUserRole(selectedUser.getId(), newRole);
+                    if (sqlite.DEBUG_MODE == 1)
+                            sqlite.addLogs(new Logs("NOTICE",currentUser.getUsername(),"User " + selectedUser.getUsername() + " edit role successful"));
                     init();
                 }
             }else{
@@ -253,7 +256,10 @@ public class MgmtUser extends javax.swing.JPanel {
                 int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + selectedUser.getUsername() + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
 
                 if (result == JOptionPane.YES_OPTION) {
-                    sqlite.removeUser(selectedUser.getUsername());
+                    String username = selectedUser.getUsername();
+                    sqlite.removeUser(username);
+                    if (sqlite.DEBUG_MODE == 1)
+                            sqlite.addLogs(new Logs("NOTICE",currentUser.getUsername(),"User " + username + " delete successful"));
                     init();
                 }
             } else {
@@ -290,13 +296,15 @@ public class MgmtUser extends javax.swing.JPanel {
                     state = "unlock";
                 }
 
-                int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + selectedUser.getUsername() + "?", "DELETE USER", JOptionPane.YES_NO_OPTION);
+                int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to " + state + " " + selectedUser.getUsername() + "?", "LOCK/UNLOCK USER", JOptionPane.YES_NO_OPTION);
 
                
                 int newStatus = (selectedUser.getLocked() == 0) ? 1 : 0;
                 
                 if (result == JOptionPane.YES_OPTION) {
                     sqlite.updateUserLockStatus(selectedUser.getId(), newStatus);
+                    if (sqlite.DEBUG_MODE == 1)
+                        sqlite.addLogs(new Logs("NOTICE",currentUser.getUsername(),state + " user " + selectedUser.getUsername() + " successful"));
                     init();
                 }
             }else{
@@ -353,6 +361,8 @@ public class MgmtUser extends javax.swing.JPanel {
                     boolean success = sqlite.changePassword(selectedUser.getId(), password.getText());
                     if (success) {
                         JOptionPane.showMessageDialog(this, "Password updated successfully.");
+                        if (sqlite.DEBUG_MODE == 1)
+                            sqlite.addLogs(new Logs("NOTICE",currentUser.getUsername(),"User " + selectedUser.getUsername() + " change password successful"));
                     } 
 
                     init();

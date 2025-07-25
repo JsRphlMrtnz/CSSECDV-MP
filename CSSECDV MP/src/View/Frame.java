@@ -228,7 +228,7 @@ public class Frame extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         
         this.main = controller;
-        
+        main.sqlite.setDebugMode();
         loginPnl.frame = this;
 //        loginPnl.main = this.main;
         
