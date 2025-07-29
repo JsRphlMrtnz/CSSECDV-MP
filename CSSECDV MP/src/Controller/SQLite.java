@@ -252,9 +252,8 @@ public class SQLite {
         }
     }
 
-    public boolean addHistory(String username, String name, int stock, String timestamp) {
-        String sql = "INSERT INTO history(username,name,stock,timestamp) VALUES('" + username + "','" + name + "','"
-                + stock + "','" + timestamp + "')";
+    public boolean addHistory(String username, String name, double price, int stock, String timestamp) {
+        String sql = "INSERT INTO history(username,name,price,stock,timestamp) VALUES(?,?,?,?,?)";
 
         try (Connection conn = DriverManager.getConnection(driverURL);
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
