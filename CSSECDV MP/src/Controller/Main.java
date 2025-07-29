@@ -118,7 +118,6 @@ public class Main {
     //            System.out.println(" Price: " + products.get(nCtr).getPrice());
     //        }
     //        // Get users
-            System.out.println("HEREEEE");
             ArrayList<User> users = sqlite.getUsers();
             System.out.println("User count: " + users.size());
             for(int nCtr = 0; nCtr < users.size(); nCtr++){
@@ -188,7 +187,6 @@ public class Main {
             
             try{
                 Files.writeString(Path.of(SESSION_FILE), token);
-                System.out.println("[LOGIN] USER VALUE IS " + getCurrentUser().getUsername());
             }catch(Exception e){
                 System.err.println("Could not write session file.");
                 e.printStackTrace();
@@ -220,7 +218,6 @@ public class Main {
                 return true;
             }      
         }
-        System.out.println("CURRENT USER IS " + getCurrentUser());
         return false;
     }
     

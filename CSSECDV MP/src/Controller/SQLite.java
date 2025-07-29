@@ -617,9 +617,17 @@ public class SQLite {
             pstmt.setInt(4, role);
             pstmt.setInt(5, 0);
             pstmt.executeUpdate();
+            
+            if(DEBUG_MODE == 1){
+                System.out.println("Successfully added user " + username + ".");
+            }
+            
+            
             return true;
         } catch (Exception ex) {
-            System.out.print(ex);
+            if(DEBUG_MODE == 1){
+                System.out.print(ex);
+            } 
             return false;
         }
     }
@@ -632,10 +640,16 @@ public class SQLite {
 
             pstmt.setString(1, username);
             pstmt.executeUpdate();
-            System.out.println("Successfully deleted user!");
+            if(DEBUG_MODE == 1){
+                System.out.println("Successfully deleted user!");
+            }
+            
         } catch (Exception ex) {
-            System.out.println("Error deleting user: " + username);
-            System.out.print(ex);
+            if(DEBUG_MODE == 1){
+                System.out.println("Error deleting user: " + username);
+                System.out.print(ex);
+            }
+            
         }
     }
 
@@ -655,10 +669,18 @@ public class SQLite {
             pstmt.setString(1, hashedPassword);
             pstmt.setString(2, userId);
             pstmt.executeUpdate();
+            
+            if(DEBUG_MODE == 1){
+                System.out.println("Successfully changed password for user " + userId + ".");
+            }
 
             return true;
 
         } catch (Exception ex) {
+            if(DEBUG_MODE == 1){
+                System.out.println("There was an error changing the password of user " + userId + ".");
+            }
+
             ex.printStackTrace();
             return false;
         }
@@ -672,10 +694,18 @@ public class SQLite {
             pstmt.setInt(1, newStatus);
             pstmt.setString(2, userId);
             pstmt.executeUpdate();
-
-            System.out.println("[SQLITE] Successfully updated user lock status.");
+            
+            if(DEBUG_MODE == 1){
+                System.out.println("Successfully " + (newStatus == 1 ? "locked" : "unlocked") + " user.");
+            }
+            
+            
         } catch (Exception ex) {
+            if(DEBUG_MODE == 1){
+                System.out.println("There was an error " + (newStatus == 1 ? "locking" : "unlocking") + " user.");
+            }
             ex.printStackTrace();
+            
         }
 
     }
@@ -741,9 +771,15 @@ public class SQLite {
             pstmt.setInt(1, role);
             pstmt.setString(2, userId);
             pstmt.executeUpdate();
+            
+            if(DEBUG_MODE == 1){
+                System.out.println("Successfully changed the role of user " + userId + " into role " + role);
+            }
 
-            System.out.println("[SQLITE] Successfully updated user role.");
         } catch (Exception ex) {
+            if(DEBUG_MODE == 1){
+                System.out.println("There was an error updating the role of user " + userId + ".");
+            }
             ex.printStackTrace();
         }
     }
