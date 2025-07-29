@@ -556,10 +556,11 @@ public class SQLite {
             // If user is found
             if (rs.next()) {
                 int locked = rs.getInt("locked");
+                int disabled = rs.getInt("role");
                 String storedHash = rs.getString("password");
 
-                if (locked == 1) {
-                    System.err.println("Login failed: Account for " + username + " is locked.");
+                if (locked == 1 || disabled == 1) {
+                    System.err.println("Login failed: Account for " + username + " is locked/disabled.");
                     return new User("", "", "", 0, 0, -1);
                 }
 
