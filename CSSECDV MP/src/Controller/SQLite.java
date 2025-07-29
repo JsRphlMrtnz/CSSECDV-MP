@@ -685,9 +685,13 @@ public class SQLite {
         try (Connection conn = DriverManager.getConnection(driverURL);
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
-            product = new Product(rs.getString("name"),
-                    rs.getInt("stock"),
-                    rs.getFloat("price"));
+            
+                
+            if (rs.next()) {
+                product = new Product(rs.getString("name"),
+                                      rs.getInt("stock"),
+                                      rs.getFloat("price"));
+            }
         } catch (Exception ex) {
             System.out.print(ex);
         }
