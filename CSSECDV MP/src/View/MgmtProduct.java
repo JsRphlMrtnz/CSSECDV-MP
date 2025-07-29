@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import Controller.Main;
+import Model.History;
 import Model.User;
 /**
  *
@@ -210,6 +211,7 @@ public class MgmtProduct extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, "Product has 0 stock left.");
             else {
                 String name = tableModel.getValueAt(table.getSelectedRow(), 0).toString();
+                double price = Double.parseDouble(tableModel.getValueAt(table.getSelectedRow(), 2).toString());
                 Object[] message = {
                     "How many " + name + " do you want to purchase?", stockFld
                 };
@@ -225,8 +227,16 @@ public class MgmtProduct extends javax.swing.JPanel {
                     else { 
                         boolean status = sqlite.purchaseProduct(name, stock, stockBuy);
                         if (status) {
-                            // add history here
-                            JOptionPane.showMessageDialog(this, "Successfully purchased product.");
+
+                            History history = new History(currentUser.getUsername(), name, price, stockBuy);
+                            boolean addHistoryStatus = sqlite.addHistory(history.getUsername(), name, price, stockBuy, history.getTimestamp().toString());
+                            
+                            if(addHistoryStatus){
+                                JOptionPane.showMessageDialog(this, "Successfully purchased product.");
+                            }else{
+                                JOptionPane.showMessageDialog(this, "Successfully purchased product, but there was an error saving the purchase history. Please contact the manager for further details.");
+                            }
+                            
                             init();
                         }
                         else
